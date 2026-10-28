@@ -1,0 +1,51 @@
+{
+  "target_classes": [
+    "school_zone",
+    "hospital_zone",
+    "speed_30",
+    "speed_50",
+    "speed_80"
+  ],
+  "background_representation": "images with empty detection-label files; no_sign is not an object-detection class",
+  "background_capture_target_images": 500,
+  "source_dataset_format": "classification folders; no bounding boxes",
+  "deployment_target": {
+    "device": "ESP32-CAM with OV2640",
+    "capture_resolution": "320x240",
+    "candidate_input_sizes": [
+      96,
+      160
+    ],
+    "quantization": "int8",
+    "candidate_architectures": [
+      "Edge Impulse FOMO",
+      "MobileNet-SSD-lite"
+    ]
+  },
+  "split": {
+    "train": 80,
+    "validation": 10,
+    "test": 10,
+    "grouping": "split by source scene and near-duplicate cluster before augmentation",
+    "device_test": "keep ESP32-CAM captures as a separate real-device test set",
+    "created": false,
+    "blocked_reason": "No target-class scene images or bounding-box labels are present."
+  },
+  "augmentation": {
+    "brightness": true,
+    "blur": true,
+    "small_rotation_degrees": 8,
+    "small_scale_percent": 10,
+    "jpeg_compression_noise": true,
+    "apply_after_split": true
+  },
+  "random_seed": 42,
+  "annotation": {
+    "format": "YOLO object detection and Edge Impulse bounding_boxes.labels",
+    "pseudo_labeling": "Use a zero-shot detector only to propose candidate boxes; manually review every proposal and retain difficult false-positive cases in the queue.",
+    "downloaded_model": false,
+    "review_fraction": null,
+    "review_fraction_note": "No pseudo-labels exist, so the review fraction is not applicable."
+  },
+  "training_status": "blocked_until_scene_data_is_collected_and_box_annotated"
+}

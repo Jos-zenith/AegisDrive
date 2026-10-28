@@ -1,0 +1,21 @@
+{
+  "summary_csv": "C:\\Users\\Zenith Joshua\\Downloads\\AI prevention\\AI prevention\\python_ai\\files (2)\\02_district_summary_2023.csv",
+  "monthly_csv": "C:\\Users\\Zenith Joshua\\Downloads\\AI prevention\\AI prevention\\python_ai\\files (2)\\01_district_monthly_2023.csv",
+  "district_count": 38,
+  "monthly_rows": 456,
+  "months_per_district": 12,
+  "monthly_totals_match_summary": true,
+  "statewide_accidents_2023": 67213,
+  "statewide_deaths_2023": 18347,
+  "statewide_helmet_non_wearing_deaths_2023": 2426,
+  "index_name": "statistical risk index",
+  "formula": "0.70 * percentile_rank(fatalities per 100 accidents) + 0.30 * percentile_rank(identified hotspot count)",
+  "percentile_definition": "Ascending average rank for ties, scaled to [0,100] using (average_rank - 1) / (district_count - 1) * 100.",
+  "limitations": [
+    "Descriptive district-level prioritization only; it is not a trained or predictive model.",
+    "Hotspot counts are not normalized by population, road length, or traffic volume.",
+    "The 2023 aggregate data has no per-trip speed, alcohol, sign, or vehicle-level features.",
+    "Weights are transparent analyst choices, not statistically fitted parameters.",
+    "Monthly data is used for consistency checks and district helmet-death totals, not forecasting."
+  ]
+}

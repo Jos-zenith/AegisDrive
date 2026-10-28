@@ -1,0 +1,7 @@
+target_class,source_class_ids,image_count,minimum_images,below_minimum,additional_esp32cam_photos_to_capture,capture_note
+school_zone,[],0,150,True,500,"Capture full 320x240 scenes with the target sign visible; collect distinct physical signs across scenes, distances, angles, lighting, and weather."
+hospital_zone,[],0,150,True,500,"Capture full 320x240 scenes with the target sign visible; collect distinct physical signs across scenes, distances, angles, lighting, and weather."
+speed_30,[],0,150,True,500,"Capture full 320x240 scenes with the target sign visible; collect distinct physical signs across scenes, distances, angles, lighting, and weather."
+speed_50,[],0,150,True,500,"Capture full 320x240 scenes with the target sign visible; collect distinct physical signs across scenes, distances, angles, lighting, and weather."
+speed_80,[],0,150,True,500,"Capture full 320x240 scenes with the target sign visible; collect distinct physical signs across scenes, distances, angles, lighting, and weather."
+no_sign,[],0,150,True,500,"Capture full 320x240 road scenes with none of the target signs; use empty detection-label files because no_sign is background, not a bounding-box class."

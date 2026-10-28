@@ -1,0 +1,10 @@
+cause_fault_of,fatal_accidents,persons_killed,grievous_accidents,grievous_persons,minor_accidents,minor_persons,non_injury_accidents,total_accidents
+Pedestrian,211,215,231,239,272,304,1,715
+Cyclist,13,13,17,17,20,24,0,50
+Driver,16800,17603,22969,25580,23801,44606,1401,64971
+Passenger,35,36,35,35,47,49,1,118
+Animal,204,205,114,133,165,329,16,499
+Bad Road,54,54,74,81,40,68,3,171
+Mechanical Defect,35,45,41,50,35,265,5,116
+Bad Weather,24,24,38,53,15,52,4,81
+Others,150,152,167,183,160,224,15,492

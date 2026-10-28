@@ -1,0 +1,39 @@
+district,statistical_risk_index,risk_rank,fatality_per_100_accidents,fatality_rate_percentile,hotspots_identified,hotspot_count_percentile,accidents_2023,deaths_2023,helmet_non_wearing_deaths_2023,index_method
+TIRUVANNAMALAI,95.14,1,36.43,100.0,188,83.78,1913,697,81,70% fatality-rate percentile + 30% hotspot-count percentile
+MADURAI,89.73,2,33.46,86.49,266,97.3,2660,890,116,70% fatality-rate percentile + 30% hotspot-count percentile
+DINDIGUL,79.05,3,32.88,81.08,125,74.32,2296,755,94,70% fatality-rate percentile + 30% hotspot-count percentile
+TIRUPATTUR,74.86,4,34.89,91.89,56,35.14,622,217,46,70% fatality-rate percentile + 30% hotspot-count percentile
+KARUR,70.54,5,31.98,72.97,112,64.86,1132,362,28,70% fatality-rate percentile + 30% hotspot-count percentile
+THOOTHUKUDI,68.92,6,33.75,89.19,42,21.62,1440,486,59,70% fatality-rate percentile + 30% hotspot-count percentile
+VELLORE,68.38,7,33.06,83.78,53,32.43,992,328,39,70% fatality-rate percentile + 30% hotspot-count percentile
+PERAMBALUR,68.11,8,35.54,97.3,18,0.0,529,188,26,70% fatality-rate percentile + 30% hotspot-count percentile
+THE NILGIRIS,67.84,9,35.21,94.59,27,5.41,213,75,8,70% fatality-rate percentile + 30% hotspot-count percentile
+VIRUDHUNAGAR,67.84,10,30.42,62.16,160,81.08,1650,502,52,70% fatality-rate percentile + 30% hotspot-count percentile
+RAMANATHAPURAM,66.35,11,32.52,75.68,65,44.59,1310,426,51,70% fatality-rate percentile + 30% hotspot-count percentile
+SIVAGANGAI,66.22,12,31.51,70.27,92,56.76,1244,392,53,70% fatality-rate percentile + 30% hotspot-count percentile
+COIMBATORE,64.32,13,28.55,51.35,235,94.59,3657,1044,155,70% fatality-rate percentile + 30% hotspot-count percentile
+ARIYALUR,62.16,14,32.53,78.38,45,24.32,584,190,37,70% fatality-rate percentile + 30% hotspot-count percentile
+ERODE,58.38,15,28.67,56.76,110,62.16,2396,687,77,70% fatality-rate percentile + 30% hotspot-count percentile
+KRISHNAGIRI,56.76,16,30.63,64.86,59,37.84,2142,656,107,70% fatality-rate percentile + 30% hotspot-count percentile
+NAMAKKAL,52.43,17,27.96,45.95,115,67.57,2089,584,50,70% fatality-rate percentile + 30% hotspot-count percentile
+RANIPET,51.35,18,31.06,67.57,36,13.51,911,283,44,70% fatality-rate percentile + 30% hotspot-count percentile
+TIRUPPUR,50.81,19,26.56,29.73,476,100.0,3294,875,73,70% fatality-rate percentile + 30% hotspot-count percentile
+TIRUCHIRAPPALLI,47.3,20,29.68,59.46,39,18.92,2426,720,84,70% fatality-rate percentile + 30% hotspot-count percentile
+THENI,46.22,21,27.78,40.54,98,59.46,1177,327,31,70% fatality-rate percentile + 30% hotspot-count percentile
+PUDUKOTTAI,45.0,22,26.59,32.43,125,74.32,1681,447,66,70% fatality-rate percentile + 30% hotspot-count percentile
+KANCHEEPURAM,42.7,23,28.59,54.05,37,16.22,1039,297,93,70% fatality-rate percentile + 30% hotspot-count percentile
+SALEM,40.41,24,24.91,18.92,207,90.54,3199,797,96,70% fatality-rate percentile + 30% hotspot-count percentile
+TIRUNELVELI,36.76,25,27.11,35.14,61,40.54,1531,415,42,70% fatality-rate percentile + 30% hotspot-count percentile
+KALLAKURICHI,34.86,26,28.04,48.65,22,2.7,1166,327,49,70% fatality-rate percentile + 30% hotspot-count percentile
+THANJAVUR,33.92,27,26.17,27.03,70,50.0,2327,609,66,70% fatality-rate percentile + 30% hotspot-count percentile
+THIRUVALLUR,33.51,28,27.82,43.24,33,10.81,2624,730,157,70% fatality-rate percentile + 30% hotspot-count percentile
+THIRUVARUR,33.24,29,25.42,24.32,86,54.05,893,227,26,70% fatality-rate percentile + 30% hotspot-count percentile
+VILLUPURAM,32.84,30,21.77,8.11,207,90.54,2591,564,82,70% fatality-rate percentile + 30% hotspot-count percentile
+DHARMAPURI,32.43,31,24.15,16.22,120,70.27,1420,343,57,70% fatality-rate percentile + 30% hotspot-count percentile
+CHENGALPATTU,28.92,32,27.51,37.84,31,8.11,3402,936,142,70% fatality-rate percentile + 30% hotspot-count percentile
+CHENNAI CITY,25.95,33,13.79,0.0,199,86.49,3654,504,45,70% fatality-rate percentile + 30% hotspot-count percentile
+CUDDALORE,25.41,34,18.74,2.7,129,78.38,3121,585,84,70% fatality-rate percentile + 30% hotspot-count percentile
+NAGAPATTINAM,24.05,35,25.33,21.62,51,29.73,529,134,11,70% fatality-rate percentile + 30% hotspot-count percentile
+TENKASI,22.57,36,22.56,10.81,70,50.0,1117,252,31,70% fatality-rate percentile + 30% hotspot-count percentile
+KANYAKUMARI,17.57,37,23.79,13.51,50,27.03,1471,350,44,70% fatality-rate percentile + 30% hotspot-count percentile
+MAYILADUTHURAI,17.16,38,18.94,5.41,65,44.59,771,146,24,70% fatality-rate percentile + 30% hotspot-count percentile

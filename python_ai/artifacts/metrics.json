@@ -1,0 +1,18 @@
+{
+  "status": "not_trained_or_evaluated",
+  "reason": "The uploaded classification dataset has no target-class examples and no bounding boxes; no ESP32-CAM held-out test set was supplied.",
+  "class_names": [
+    "school_zone",
+    "hospital_zone",
+    "speed_30",
+    "speed_50",
+    "speed_80"
+  ],
+  "test_metrics": null,
+  "real_device_metrics": null,
+  "domain_gap": null,
+  "model_size_bytes": null,
+  "ram_estimate_bytes": null,
+  "inference_time_ms": null,
+  "note": "Null means not measured; no metric or deployment estimate is asserted."
+}

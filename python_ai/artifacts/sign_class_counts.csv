@@ -1,0 +1,60 @@
+source_class_id,source_class_name,image_count,mapped_target_classes,mapping_status
+0,Give way,201,[],no_semantic_match_to_target
+1,No entry,201,[],no_semantic_match_to_target
+2,One-way traffic,201,[],no_semantic_match_to_target
+3,One-way traffic,201,[],no_semantic_match_to_target
+4,No vehicles in both directions,201,[],no_semantic_match_to_target
+5,No entry for cycles,321,[],no_semantic_match_to_target
+6,No entry for goods vehicles,201,[],no_semantic_match_to_target
+7,No entry for pedestrians,201,[],no_semantic_match_to_target
+8,No entry for bullock carts,601,[],no_semantic_match_to_target
+9,No entry for hand carts,201,[],no_semantic_match_to_target
+10,No entry for motor vehicles,201,[],no_semantic_match_to_target
+11,Height limit,201,[],no_semantic_match_to_target
+12,Weight limit,201,[],no_semantic_match_to_target
+13,Axle weight limit,201,[],no_semantic_match_to_target
+14,Length limit,201,[],no_semantic_match_to_target
+15,No left turn,201,[],no_semantic_match_to_target
+16,No right turn,201,[],no_semantic_match_to_target
+17,No overtaking,201,[],no_semantic_match_to_target
+18,Maximum speed limit (90 km/h),201,[],no_semantic_match_to_target
+19,Maximum speed limit (110 km/h),201,[],no_semantic_match_to_target
+20,Horn prohibited,601,[],no_semantic_match_to_target
+21,No parking,201,[],no_semantic_match_to_target
+22,No stopping,201,[],no_semantic_match_to_target
+23,Turn left,201,[],no_semantic_match_to_target
+24,Turn right,201,[],no_semantic_match_to_target
+25,Steep descent,201,[],no_semantic_match_to_target
+26,Steep ascent,201,[],no_semantic_match_to_target
+27,Narrow road,201,[],no_semantic_match_to_target
+28,Narrow bridge,201,[],no_semantic_match_to_target
+29,Unprotected quay,201,[],no_semantic_match_to_target
+30,Road hump,201,[],no_semantic_match_to_target
+31,Dip,201,[],no_semantic_match_to_target
+32,Loose gravel,201,[],no_semantic_match_to_target
+33,Falling rocks,201,[],no_semantic_match_to_target
+34,Cattle,201,[],no_semantic_match_to_target
+35,Crossroads,201,[],no_semantic_match_to_target
+36,Side road junction,201,[],no_semantic_match_to_target
+37,Side road junction,201,[],no_semantic_match_to_target
+38,Oblique side road junction,201,[],no_semantic_match_to_target
+39,Oblique side road junction,0,[],no_semantic_match_to_target
+40,T-junction,201,[],no_semantic_match_to_target
+41,Y-junction,201,[],no_semantic_match_to_target
+42,Staggered side road junction,201,[],no_semantic_match_to_target
+43,Staggered side road junction,201,[],no_semantic_match_to_target
+44,Roundabout,201,[],no_semantic_match_to_target
+45,Guarded level crossing ahead,201,[],no_semantic_match_to_target
+46,Unguarded level crossing ahead,201,[],no_semantic_match_to_target
+47,Level crossing countdown marker,144,[],no_semantic_match_to_target
+48,Level crossing countdown marker,168,[],no_semantic_match_to_target
+49,Level crossing countdown marker,58,[],no_semantic_match_to_target
+50,Level crossing countdown marker,193,[],no_semantic_match_to_target
+51,Parking,600,[],no_semantic_match_to_target
+52,Bus stop,220,[],no_semantic_match_to_target
+53,First aid post,607,[],no_semantic_match_to_target
+54,Telephone,602,[],no_semantic_match_to_target
+55,Filling station,616,[],no_semantic_match_to_target
+56,Hotel,200,[],no_semantic_match_to_target
+57,Restaurant,201,[],no_semantic_match_to_target
+58,Refreshments,196,[],no_semantic_match_to_target
