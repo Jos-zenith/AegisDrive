@@ -148,7 +148,7 @@ def audit_signs(dataset: Path) -> dict[str, Any]:
     )
 
     return {
-        "dataset_path": str(dataset),
+        "dataset_path": dataset.name,
         "format": "PNG images arranged in class folders; classification labels only",
         "image_count": sum(counts.values()),
         "class_directory_count": len(ids_from_dirs),
@@ -276,8 +276,8 @@ def build_district_index(summary_path: Path, monthly_path: Path) -> tuple[list[d
         row["risk_rank"] = rank
 
     audit = {
-        "summary_csv": str(summary_path),
-        "monthly_csv": str(monthly_path),
+        "summary_csv": summary_path.name,
+        "monthly_csv": monthly_path.name,
         "district_count": len(results),
         "monthly_rows": len(monthly),
         "months_per_district": 12,
@@ -387,10 +387,18 @@ def main() -> None:
     parser.add_argument(
         "--sign-dataset",
         type=Path,
-        default=default_root.parent / "archive (1)" / "Indian-Traffic Sign-Dataset",
+        default=default_root.parent.parent
+        / "archive (1)"
+        / "Indian-Traffic Sign-Dataset",
     )
-    parser.add_argument("--csv-dir", type=Path, default=default_root / "files (2)")
-    parser.add_argument("--output-dir", type=Path, default=default_root / "artifacts")
+    parser.add_argument(
+        "--csv-dir",
+        type=Path,
+        default=default_root.parent / "datasets" / "tn_accidents_source",
+    )
+    parser.add_argument(
+        "--output-dir", type=Path, default=default_root.parent / "artifacts"
+    )
     args = parser.parse_args()
 
     sign_audit = audit_signs(args.sign_dataset)
@@ -399,7 +407,7 @@ def main() -> None:
         args.csv_dir / "01_district_monthly_2023.csv",
     )
     write_json(args.output_dir / "data_audit.json", sign_audit)
-    write_audit_report(args.output_dir / "data_audit_report.md", sign_audit)
+    write_json(args.output_dir / "data_audit_summary.json", sign_audit)
     write_csv(
         args.output_dir / "sign_class_counts.csv",
         sign_audit["class_counts"],

@@ -1,5 +1,5 @@
 {
-  "dataset_path": "C:\\Users\\Zenith Joshua\\Downloads\\AI prevention\\AI prevention\\archive (1)\\Indian-Traffic Sign-Dataset",
+  "dataset_path": "Indian-Traffic Sign-Dataset",
   "format": "PNG images arranged in class folders; classification labels only",
   "image_count": 13971,
   "class_directory_count": 58,

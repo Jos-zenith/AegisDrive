@@ -11,6 +11,12 @@ VALID_SPEED_LIMITS = frozenset({30, 50, 80})
 
 
 @dataclass(frozen=True)
+class SyncState:
+    sequence: int
+    epoch: int
+
+
+@dataclass(frozen=True)
 class ControllerTelemetry:
     sequence: int
     mq3_adc: int
@@ -37,6 +43,56 @@ def encode_command(sequence: int, object_hazard: bool, sign_limit: int | None) -
     if limit_value != -1 and limit_value not in VALID_SPEED_LIMITS:
         raise ValueError("sign_limit must be None, 30, 50, or 80")
     return f"CMD,{sequence},{int(object_hazard)},{limit_value}\n".encode("ascii")
+
+
+def encode_sync_request() -> bytes:
+    return b"SYNC\n"
+
+
+def encode_sync_confirmation(epoch: int) -> bytes:
+    if not 0 <= epoch <= 4_294_967_295:
+        raise ValueError("sync epoch must be an unsigned 32-bit integer")
+    return f"SYNC,{epoch}\n".encode("ascii")
+
+
+def parse_sync_response(line: bytes | str) -> SyncState:
+    try:
+        text = line.decode("ascii").strip() if isinstance(line, bytes) else line.strip()
+    except UnicodeDecodeError as exc:
+        raise ValueError("sync response must be ASCII") from exc
+    fields = text.split(",")
+    if len(fields) != 3 or fields[0] != "STATE":
+        raise ValueError("sync response must be STATE,sequence,epoch")
+    try:
+        sequence = int(fields[1])
+        epoch = int(fields[2])
+    except ValueError as exc:
+        raise ValueError("sync response values must be integers") from exc
+    if not 0 <= sequence <= 2_147_483_647:
+        raise ValueError("sync response sequence is outside the allowed range")
+    if not 0 <= epoch <= 4_294_967_295:
+        raise ValueError("sync response epoch is outside the allowed range")
+    return SyncState(sequence=sequence, epoch=epoch)
+
+
+def parse_sync_confirmation(line: bytes | str, expected_epoch: int) -> SyncState:
+    try:
+        text = line.decode("ascii").strip() if isinstance(line, bytes) else line.strip()
+    except UnicodeDecodeError as exc:
+        raise ValueError("sync confirmation must be ASCII") from exc
+    fields = text.split(",")
+    if len(fields) != 3 or fields[0] != "READY":
+        raise ValueError("sync confirmation must be READY,sequence,epoch")
+    try:
+        sequence = int(fields[1])
+        epoch = int(fields[2])
+    except ValueError as exc:
+        raise ValueError("sync confirmation values must be integers") from exc
+    if epoch != expected_epoch:
+        raise ValueError("sync confirmation epoch does not match the request")
+    if not 0 <= sequence <= 2_147_483_647:
+        raise ValueError("sync confirmation sequence is outside the allowed range")
+    return SyncState(sequence=sequence, epoch=epoch)
 
 
 def parse_telemetry(line: bytes | str, received_monotonic: float | None = None) -> ControllerTelemetry:

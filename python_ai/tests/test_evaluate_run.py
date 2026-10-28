@@ -1,6 +1,6 @@
 import unittest
 
-from evaluate_run import evaluate
+from data_tools.evaluate_run import evaluate
 
 
 class EvaluateRunTests(unittest.TestCase):

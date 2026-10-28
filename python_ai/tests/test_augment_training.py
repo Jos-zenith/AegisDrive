@@ -8,7 +8,7 @@ import numpy as np
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from augment_training import build_training_augmentations
+from data_tools.augment_training import build_training_augmentations
 
 
 class TrainingAugmentationTests(unittest.TestCase):

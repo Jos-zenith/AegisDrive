@@ -5,7 +5,14 @@ import time
 
 import serial
 
-from serial_protocol import encode_command, parse_telemetry
+from serial_protocol import (
+    encode_command,
+    encode_sync_confirmation,
+    encode_sync_request,
+    parse_sync_response,
+    parse_sync_confirmation,
+    parse_telemetry,
+)
 
 
 def read_valid_telemetry(controller: serial.Serial, deadline: float) -> dict[str, object] | None:
@@ -54,10 +61,31 @@ def main() -> None:
     with serial.Serial(args.port, args.baud, timeout=0.2, write_timeout=0.5) as controller:
         time.sleep(2.0)
         controller.reset_input_buffer()
+        controller.write(encode_sync_request())
+        controller.flush()
+        sync_deadline = time.monotonic() + 2.0
+        sequence = None
+        while time.monotonic() < sync_deadline:
+            line = controller.readline()
+            if not line:
+                continue
+            try:
+                sync_state = parse_sync_response(line)
+                controller.write(encode_sync_confirmation(sync_state.epoch))
+                controller.flush()
+                confirmation = controller.readline()
+                sequence = parse_sync_confirmation(
+                    confirmation, sync_state.epoch
+                ).sequence
+                break
+            except ValueError:
+                continue
+        if sequence is None:
+            raise RuntimeError("Could not synchronize sequence with controller")
         baseline_deadline = time.monotonic() + args.baseline_timeout
         stable_motor_samples = 0
         while time.monotonic() < baseline_deadline:
-            sequence = (sequence + 1) % 2_147_483_648
+            sequence = sequence + 1
             controller.write(encode_command(sequence, False, None))
             controller.flush()
             telemetry = read_valid_telemetry(controller, time.monotonic() + 0.35)

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from prepare_yolo_split import CLASS_NAMES, image_group_split, prepare_split
+from data_tools.prepare_yolo_split import CLASS_NAMES, image_group_split, prepare_split
 
 
 class PrepareYoloSplitTests(unittest.TestCase):

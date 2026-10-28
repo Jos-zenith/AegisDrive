@@ -1,6 +1,6 @@
 {
-  "summary_csv": "C:\\Users\\Zenith Joshua\\Downloads\\AI prevention\\AI prevention\\python_ai\\files (2)\\02_district_summary_2023.csv",
-  "monthly_csv": "C:\\Users\\Zenith Joshua\\Downloads\\AI prevention\\AI prevention\\python_ai\\files (2)\\01_district_monthly_2023.csv",
+  "summary_csv": "02_district_summary_2023.csv",
+  "monthly_csv": "01_district_monthly_2023.csv",
   "district_count": 38,
   "monthly_rows": 456,
   "months_per_district": 12,

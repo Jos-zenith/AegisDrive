@@ -1,9 +1,31 @@
 import unittest
 
-from serial_protocol import encode_command, parse_telemetry
+from serial_protocol import (
+    encode_command,
+    encode_sync_confirmation,
+    encode_sync_request,
+    parse_sync_confirmation,
+    parse_sync_response,
+    parse_telemetry,
+)
 
 
 class SerialProtocolTests(unittest.TestCase):
+    def test_sync_handshake_is_safe_and_reads_controller_sequence(self) -> None:
+        self.assertEqual(encode_sync_request(), b"SYNC\n")
+        state = parse_sync_response(b"STATE,800,123\n")
+        self.assertEqual(state.sequence, 800)
+        self.assertEqual(state.epoch, 123)
+        self.assertEqual(encode_sync_confirmation(123), b"SYNC,123\n")
+        ready = parse_sync_confirmation(b"READY,800,123\n", 123)
+        self.assertEqual(ready.sequence, 800)
+        with self.assertRaises(ValueError):
+            parse_sync_response(b"STATE,800,enable\n")
+        with self.assertRaises(ValueError):
+            parse_sync_confirmation(b"READY,800,124\n", 123)
+        with self.assertRaises(ValueError):
+            parse_sync_response(b"STATE,\xff\n")
+
     def test_command_encodes_distinct_object_and_sign_inputs(self) -> None:
         self.assertEqual(
             encode_command(12, True, 50),

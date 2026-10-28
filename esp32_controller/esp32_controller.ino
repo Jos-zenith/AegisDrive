@@ -4,6 +4,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
+#include "esp_system.h"
 
 // Prototype-only wiring. Verify against the exact board and modules.
 static const int MQ3_PIN = 34;
@@ -45,6 +46,7 @@ unsigned long lastLcdMs = 0;
 unsigned long railStartMs = 0;
 unsigned long motorRunStartedMs = 0;
 unsigned long lastValidSequence = 0;
+uint32_t syncEpoch = 0;
 bool haveSequence = false;
 bool objectHazard = false;
 bool commandStale = true;
@@ -137,12 +139,38 @@ bool processCommand(const char *line) {
   return true;
 }
 
+bool processControlLine(const char *line) {
+  if (strcmp(line, "SYNC") == 0) {
+    Serial.print("STATE,");
+    Serial.print(haveSequence ? lastValidSequence : 0);
+    Serial.print(",");
+    Serial.println(syncEpoch);
+    return true;
+  }
+  if (strncmp(line, "SYNC,", 5) == 0) {
+    char *end = NULL;
+    errno = 0;
+    unsigned long requestedEpoch = strtoul(line + 5, &end, 10);
+    if (errno == ERANGE || end == line + 5 || *end != '\0' ||
+        requestedEpoch != syncEpoch) {
+      Serial.println("ERR,SYNC_REJECTED");
+      return false;
+    }
+    Serial.print("READY,");
+    Serial.print(haveSequence ? lastValidSequence : 0);
+    Serial.print(",");
+    Serial.println(syncEpoch);
+    return true;
+  }
+  return processCommand(line);
+}
+
 void readSerialCommands() {
   while (Serial.available() > 0) {
     char ch = (char)Serial.read();
     if (ch == '\n') {
       serialLine[serialLength] = '\0';
-      if (serialLength > 0 && !processCommand(serialLine)) {
+      if (serialLength > 0 && !processControlLine(serialLine)) {
         Serial.println("ERR,COMMAND_REJECTED");
       }
       serialLength = 0;
@@ -246,7 +274,8 @@ void sendTelemetry(unsigned long now) {
   Serial.print(motorPwm);
   Serial.print(",hazard=");
   Serial.print((eStopActive || commandStale || sensorFault || alcoholAlert ||
-                objectHazard || overspeedAlert) ? 1 : 0);
+                objectHazard || overspeedAlert ||
+                now - bootMs < MQ3_WARMUP_MS) ? 1 : 0);
   Serial.print(",estop=");
   Serial.print(eStopActive ? 1 : 0);
   Serial.print(",warmup=");
@@ -289,6 +318,7 @@ void updateDisplay(unsigned long now) {
 
 void setup() {
   bootMs = millis();
+  syncEpoch = esp_random();
   lastRpmSampleMs = bootMs;
   lastPulseMs = 0;
   Serial.begin(115200);

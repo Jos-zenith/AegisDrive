@@ -16,9 +16,9 @@ EXPECTED_NAMES = [
     "speed_50",
     "speed_80",
 ]
-DEFAULT_BASE_MODEL = Path(__file__).with_name("yolo11n.pt")
+DEFAULT_BASE_MODEL = Path(__file__).resolve().parents[1] / "yolo11n.pt"
 DEFAULT_RUNS_DIR = Path(__file__).with_name("runs") / "traffic_signs"
-ARTIFACTS_DIR = Path(__file__).with_name("artifacts")
+ARTIFACTS_DIR = Path(__file__).resolve().parents[1] / "artifacts"
 
 
 def class_names_from_yaml(config: dict[str, Any]) -> list[str]:

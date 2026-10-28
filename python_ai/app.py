@@ -10,9 +10,12 @@ import serial
 from ultralytics import YOLO
 
 from serial_protocol import (
-    VALID_SPEED_LIMITS,
     encode_command,
+    encode_sync_confirmation,
+    encode_sync_request,
     parse_telemetry,
+    parse_sync_confirmation,
+    parse_sync_response,
     telemetry_to_dict,
     write_jsonl_record,
 )
@@ -27,6 +30,8 @@ RUNTIME_LOG_PATH = Path(__file__).with_name("artifacts") / "runtime_metrics.json
 EVALUATION_FRAME_DIR = Path(__file__).with_name("artifacts") / "evaluation_frames"
 
 HAZARD_CLASSES = {"person", "bicycle", "car", "motorcycle", "bus", "truck"}
+OBJECT_PRESENCE_MIN_AREA_RATIO = 0.03
+OBJECT_PRESENCE_REGION_TOP_RATIO = 0.40
 SIGN_SPEED_LIMITS = {"speed_30": 30, "speed_50": 50, "speed_80": 80}
 SIGN_ZONE_CLASSES = {"school_zone", "hospital_zone"}
 SUPPORTED_SIGN_CLASSES = set(SIGN_SPEED_LIMITS) | SIGN_ZONE_CLASSES
@@ -37,7 +42,7 @@ EVALUATION_FRAME_INTERVAL_SECONDS = 1.0
 # -------------------------------------
 
 
-def connect_serial() -> serial.Serial:
+def connect_serial() -> tuple[serial.Serial, int]:
     controller = serial.Serial(
         SERIAL_PORT,
         SERIAL_BAUD,
@@ -46,8 +51,47 @@ def connect_serial() -> serial.Serial:
     )
     time.sleep(2.0)
     controller.reset_input_buffer()
+    sync_state = None
+    for _attempt in range(3):
+        controller.write(encode_sync_request())
+        controller.flush()
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            line = controller.readline()
+            if not line:
+                continue
+            try:
+                sync_state = parse_sync_response(line)
+                break
+            except ValueError:
+                continue
+        if sync_state is None:
+            continue
+        controller.write(encode_sync_confirmation(sync_state.epoch))
+        controller.flush()
+        deadline = time.monotonic() + 2.0
+        while time.monotonic() < deadline:
+            line = controller.readline()
+            if not line:
+                continue
+            try:
+                confirmed = parse_sync_confirmation(line, sync_state.epoch)
+                sync_state = confirmed
+                break
+            except ValueError:
+                continue
+        else:
+            sync_state = None
+        if sync_state is not None:
+            break
+    if sync_state is None:
+        controller.close()
+        raise RuntimeError(
+            "Controller synchronization failed or changed during the handshake; "
+            "no motor command was sent."
+        )
     print(f"Connected to ESP32 controller on {SERIAL_PORT}")
-    return controller
+    return controller, sync_state.sequence
 
 
 def normalize_name(name: object) -> str:
@@ -111,19 +155,21 @@ def main() -> None:
     object_model = YOLO(str(OBJECT_MODEL_PATH))
 
     sign_model = None
-    if not SIGN_MODEL_PATH.is_file():
-        raise FileNotFoundError(
-            f"Sign model not found: {SIGN_MODEL_PATH}. Collect and label the target "
-            "classes before running the integrated detector."
+    if SIGN_MODEL_PATH.is_file():
+        sign_model = YOLO(str(SIGN_MODEL_PATH))
+        unsupported = model_names(sign_model) - SUPPORTED_SIGN_CLASSES
+        missing = SUPPORTED_SIGN_CLASSES - model_names(sign_model)
+        if unsupported or missing:
+            raise ValueError(
+                "Sign model labels must match exactly the configured target classes. "
+                f"Unsupported={sorted(unsupported)}, missing={sorted(missing)}"
+            )
+    else:
+        print(
+            "DEGRADED MODE: sign model not found; traffic-sign recognition and "
+            "speed-limit control are disabled."
         )
-    sign_model = YOLO(str(SIGN_MODEL_PATH))
-    unsupported = model_names(sign_model) - SUPPORTED_SIGN_CLASSES
-    missing = SUPPORTED_SIGN_CLASSES - model_names(sign_model)
-    if unsupported or missing:
-        raise ValueError(
-            "Sign model labels must match exactly the configured target classes. "
-            f"Unsupported={sorted(unsupported)}, missing={sorted(missing)}"
-        )
+    sign_model_status = "available" if sign_model is not None else "disabled_missing_model"
 
     cap = cv2.VideoCapture(CAMERA_STREAM_URL)
     if not cap.isOpened():
@@ -134,12 +180,12 @@ def main() -> None:
     controller = None
     log_stream = None
     try:
-        controller = connect_serial()
+        controller, controller_sequence = connect_serial()
         RUNTIME_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         log_stream = RUNTIME_LOG_PATH.open("a", encoding="utf-8")
         print(f"Runtime telemetry log: {RUNTIME_LOG_PATH}")
 
-        sequence = 0
+        sequence = controller_sequence
         run_id = uuid.uuid4().hex
         current_sign_limit = None
         last_sign_seen = 0.0
@@ -159,6 +205,7 @@ def main() -> None:
                         "event": "camera_frame_failure",
                         "elapsed_ms": (time.perf_counter() - frame_started) * 1000,
                         "ground_truth": None,
+                        "sign_model_status": sign_model_status,
                     },
                 )
                 raise RuntimeError(
@@ -167,11 +214,20 @@ def main() -> None:
                 )
 
             object_detections, object_inference_ms = detect(object_model, frame)
-            sign_detections, sign_inference_ms = detect(sign_model, frame)
+            sign_detections, sign_inference_ms = (
+                detect(sign_model, frame) if sign_model is not None else ([], 0.0)
+            )
             now = time.monotonic()
 
+            frame_height, frame_width = frame.shape[:2]
             object_hazard = any(
                 detection["class"] in HAZARD_CLASSES
+                and detection["box_xyxy"][1] >= frame_height * OBJECT_PRESENCE_REGION_TOP_RATIO
+                and (
+                    (detection["box_xyxy"][2] - detection["box_xyxy"][0])
+                    * (detection["box_xyxy"][3] - detection["box_xyxy"][1])
+                    / (frame_width * frame_height)
+                ) >= OBJECT_PRESENCE_MIN_AREA_RATIO
                 for detection in object_detections
             )
             target_signs = [
@@ -208,6 +264,7 @@ def main() -> None:
                         "object_hazard_input": bool(object_hazard),
                         "sign_limit_input": current_sign_limit,
                         "ground_truth": None,
+                        "sign_model_status": sign_model_status,
                     },
                 )
                 raise
@@ -305,12 +362,13 @@ def main() -> None:
                     "controller_telemetry": new_readings,
                     "invalid_telemetry_count": invalid_telemetry_count,
                     "ground_truth": None,
+                    "sign_model_status": sign_model_status,
                 },
             )
 
             cv2.putText(
                 frame,
-                f"object_hazard={int(object_hazard)} sign_limit={current_sign_limit}",
+                f"object_trigger={int(object_hazard)} sign_limit={current_sign_limit}",
                 (8, 20),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.45,
@@ -333,6 +391,15 @@ def main() -> None:
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.4,
                 (255, 255, 255),
+                1,
+            )
+            cv2.putText(
+                frame,
+                f"sign_model: {sign_model_status}",
+                (8, 76),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,
+                (0, 0, 255) if sign_model is None else (0, 255, 0),
                 1,
             )
             cv2.imshow("AegisDrive - bench prototype", frame)
