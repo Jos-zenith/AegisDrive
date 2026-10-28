@@ -31,11 +31,12 @@ This is a **bench-top prototype starter**, not a certified vehicle safety system
 ### 1. Test the ESP32 controller alone
 Open `esp32_controller.ino` in Arduino IDE, select your ESP32 board and COM port, then upload.
 For the first test, keep the motor wheels off the ground and have a physical power switch available.
-The firmware accepts these serial lines from Python:
-- `LIMIT:40` — set a simulated speed limit value (0–120)
-- `HAZARD:1` or `HAZARD:0` — hazard detected/not detected
-- `SIGN:30`, `SIGN:40`, `SIGN:50`, etc. — detected speed sign; Python uses `LIMIT:` for this starter
-- `AI:0` — clear AI hazard flag
+The host/controller protocol is `CMD,<sequence>,<object_hazard>,<sign_limit>`.
+For example, `CMD,1,1,50` means object-hazard input true and a recognized
+50-limit sign; `-1` means no current speed-limit sign. The controller returns
+separate sensor and output telemetry. See
+[`python_ai/CONTROL_AND_EVALUATION.md`](./python_ai/CONTROL_AND_EVALUATION.md)
+for validation, timeouts, output priority, and the bench-only disconnect test.
 
 ### 2. Test the ESP32-CAM stream
 Use the Arduino IDE example **File > Examples > ESP32 > Camera > CameraWebServer** for your installed ESP32 package. Select the correct camera model (commonly `CAMERA_MODEL_AI_THINKER`), enter Wi-Fi credentials, upload, and open the IP printed in Serial Monitor.
@@ -102,6 +103,31 @@ and grouped train/validation/test splits. See
 [`python_ai/CAPTURE_PROTOCOL.md`](./python_ai/CAPTURE_PROTOCOL.md). These are
 planned collection targets, not completed data or measured detector results.
 
+After collecting and manually reviewing full-scene boxes, prepare grouped
+YOLO splits from a reviewed CSV manifest using:
+```bat
+py prepare_yolo_split.py reviewed_manifest.csv --output-dir data_signs_split --seed 42
+```
+Then configure a local `data_signs.yaml`, augment the training split only, and
+train/evaluate:
+```bat
+py augment_training.py --data data_signs.yaml --output data_signs_augmented.yaml --seed 42
+py train_signs.py --data data_signs_augmented.yaml --seed 42 --image-size 160
+```
+Training requires a local checkpoint; it will not silently download one. Test and
+runtime evaluation, the serial command contract, output policy, startup
+checks, and fault-injection procedure are documented in
+[`python_ai/CONTROL_AND_EVALUATION.md`](./python_ai/CONTROL_AND_EVALUATION.md).
+
+The host sends separate object-hazard and recognized speed-limit inputs.
+Measured RPM and MQ-3 ADC stay on the ESP32 and are reported separately in
+telemetry. The host writes inference/response logs to
+`python_ai/artifacts/runtime_metrics.jsonl`, plus sampled evaluation frames.
+Use `py label_runtime_frames.py artifacts\runtime_metrics.jsonl` to add manual
+ground truth before calculating false positives or false negatives. The full
+evaluation command and bench fault test are in
+[`python_ai/CONTROL_AND_EVALUATION.md`](./python_ai/CONTROL_AND_EVALUATION.md).
+
 ## Wiring assumed by the ESP32 sketch
 | Module | Pin | ESP32 DevKit |
 |---|---|---|
@@ -111,10 +137,15 @@ planned collection targets, not completed data or measured detector results.
 | L298N IN1 | Direction | GPIO 26 |
 | L298N IN2 | Direction | GPIO 14 |
 | Active buzzer signal | Signal | GPIO 33 (use a driver transistor if required by buzzer current) |
+| Software E-stop button | Active-low input | GPIO 32 (button to GND) |
 | I2C LCD SDA | SDA | GPIO 21 |
 | I2C LCD SCL | SCL | GPIO 22 |
 
-Power the motor separately with a suitable supply. Connect grounds together. Do not power the motor from an ESP32 pin. Do not connect a 5 V logic output directly to ESP32 GPIO.
+Power the motor separately with a suitable supply. Put an independent,
+reachable normally-closed emergency cutoff switch in series with the motor
+supply; GPIO 32 is only a software stop. Connect grounds together. Do not
+power the motor from an ESP32 pin. Do not connect a 5 V logic output directly
+to ESP32 GPIO.
 
 ## What the project does
 - Detects common road objects using the COCO model.

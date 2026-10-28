@@ -1,12 +1,13 @@
-# Copy this file to data_signs.yaml and replace paths with your dataset paths.
-# Dataset must use YOLO object-detection format with images/labels and bounding boxes.
-path: C:/datasets/indian_traffic_signs
+# Copy this file to data_signs.yaml and use prepare_yolo_split.py to create a
+# grouped dataset from reviewed full-scene Edge Impulse/YOLO annotations.
+path: C:/datasets/traffic_signs_split
 train: images/train
 val: images/val
+test: images/test
 
 names:
-  0: speed_limit_30
-  1: speed_limit_40
-  2: speed_limit_50
-  3: stop_sign
-  4: warning_sign
+  0: school_zone
+  1: hospital_zone
+  2: speed_30
+  3: speed_50
+  4: speed_80
